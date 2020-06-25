@@ -1,0 +1,77 @@
+{
+  //Important Requires PR: https://github.com/OrchardCMS/OrchardCore/pull/6438 
+  "name": "TenantCreatedWorkflow",
+  "displayName": "Tenant Created Workflow Recipe",
+  "description": "Email Admin tenant setup page",
+  "author": "LefeWare Learning",
+  "website": "https://LefewareLearning.com",
+  "version": "1.0.0",
+  "issetuprecipe": false,
+  "categories": [ "default" ],
+  "tags": [ "Tenants" ],
+
+  // The variables are evaluated the first time they are accessed, and reused across steps
+  "variables": {
+    "workflowTypeId": "[js:uuid()]",
+    "workflowTenantCreatedActivityId": "[js:uuid()]",
+    "workflowEmailAdmindActivityId": "[js:uuid()]"
+  },
+  "steps": [
+    {
+      "name": "WorkflowType",
+      "data": [
+        {
+          "WorkflowTypeId": "[js: variables('workflowTypeId')]",
+          "Name": "Tenant Created Workflow",
+          "IsEnabled": true,
+          "IsSingleton": false,
+          "DeleteFinishedWorkflows": true,
+          "Activities": [
+            {
+              "ActivityId": "[js: variables('workflowTenantCreatedActivityId')]",
+              "Name": "TenantCreatedEvent",
+              "X": 20,
+              "Y": 200,
+              "IsStart": true,
+              "Properties": {
+                "ActivityMetadata": {
+                  "Title": "Tenant Created"
+                }
+              }
+            },
+            {
+              "ActivityId": "[js: variables('workflowEmailAdmindActivityId')]",
+              "Name": "EmailTask",
+              "X": 200,
+              "Y": 200,
+              "IsStart": false,
+              "Properties": {
+                "ActivityMetadata": {
+                  "Title": "Send admin email to set up site"
+                },
+                "Recipients": {
+                  "Expression": "{{Workflow.Input[\"AdminEmail\"]}}" //Had to customly extend ShellSettings class to add this new field
+                },
+                "Subject": {
+                  "Expression": "Welcome to {{Site.SiteName}}"
+                },
+                "Body": {
+                  "Expression": "Thank you for your signing up to {{Site.SiteName}}.</br> Please navigate to the following <a href=\"{{Workflow.Input[\"EncodedUrl\"]}}\">link</a> and follow the steps to set up your course portal. <br/> For any questions or issues please email our support team"
+                },
+                "IsHtml":  true
+              }
+            }
+          ],
+          "Transitions": [
+            {
+              "Id": 0,
+              "SourceActivityId": "[js: variables('workflowTenantCreatedActivityId')]",
+              "SourceOutcomeName": "Done",
+              "DestinationActivityId": "[js: variables('workflowEmailAdmindActivityId')]"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
