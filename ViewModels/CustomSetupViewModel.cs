@@ -1,6 +1,6 @@
 using OrchardCore.Setup.ViewModels;
 
-namespace LefeWareLearning.Tenants.ViewModels
+namespace OrchardCore.CustomSetup.ViewModels
 {
     public class CustomSetupViewModel : SetupViewModel
     {

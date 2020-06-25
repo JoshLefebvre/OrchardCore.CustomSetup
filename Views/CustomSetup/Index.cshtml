@@ -10,7 +10,7 @@
 @inject IOptions<RequestLocalizationOptions> LocOptions
 @inject OrchardCore.IOrchardHelper Orchard
 @inject OrchardCore.Modules.IClock Clock
-@model LefeWareLearning.Tenants.ViewModels.CustomSetupViewModel
+@model OrchardCore.CustomSetup.ViewModels.CustomSetupViewModel
 
 @{
     // The Setup Layout is a standard MVC layout do that it doesn't use Shapes.
@@ -85,7 +85,7 @@
     }
 </div>
 
-<form asp-action="Setup">
+<form asp-action="Index">
     <div class="bg-light p-2">
         <h1>@T["Setup"]</h1>
         <p class="lead">@T["Please answer a few questions to configure your site."]</p>

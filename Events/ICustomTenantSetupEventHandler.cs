@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
 
-namespace LefeWareLearning.CustomSetup.Events
+namespace OrchardCore.CustomSetup.Events
 {
     /// <summary>
     /// Called when a tenant is set up.

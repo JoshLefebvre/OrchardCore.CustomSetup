@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using OrchardCore.Data.Migration;
 using OrchardCore.Recipes.Services;
 
-namespace LefeWareLearning.Tenants
+namespace OrchardCore.CustomSetup
 {
     public class CustomSetupMigrations : DataMigration
     {

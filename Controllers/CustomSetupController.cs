@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using LefeWareLearning.CustomSetup.Events;
-using LefeWareLearning.Tenants.ViewModels;
+using OrchardCore.CustomSetup.Events;
+using OrchardCore.CustomSetup.ViewModels;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -15,9 +15,9 @@ using OrchardCore.Environment.Shell;
 using OrchardCore.Modules;
 using OrchardCore.Setup.Services;
 
-namespace LefeWareLearning.CustomSetup.Controllers
+namespace OrchardCore.CustomSetup.Controllers
 {
-    public class CustomTenantSetupController : Controller
+    public class CustomSetupController : Controller
     {
         private readonly IShellHost _shellHost;
         private readonly ISetupService _setupService;
@@ -28,13 +28,13 @@ namespace LefeWareLearning.CustomSetup.Controllers
         private readonly IEmailAddressValidator _emailAddressValidator;
         private readonly IConfiguration _configuration;
 
-        public CustomTenantSetupController(
+        public CustomSetupController(
             IShellHost shellHost,
             ISetupService setupService,
             ShellSettings shellSettings,
             IClock clock,
-            ILogger<CustomTenantSetupController> logger,
-            IStringLocalizer<CustomTenantSetupController> localizer,
+            ILogger<CustomSetupController> logger,
+            IStringLocalizer<CustomSetupController> localizer,
             IEmailAddressValidator emailAddressValidator,
             IConfiguration configuration)
         {
@@ -48,7 +48,7 @@ namespace LefeWareLearning.CustomSetup.Controllers
             _configuration = configuration;
         }
 
-        public async Task<ActionResult> Setup(string token)
+        public async Task<ActionResult> Index(string token)
         {
             if (!await IsValidRequest(token))
             {
@@ -59,8 +59,8 @@ namespace LefeWareLearning.CustomSetup.Controllers
         }
 
 
-        [HttpPost, ActionName("Setup")]
-        public async Task<ActionResult> Setup(CustomSetupViewModel model)
+        [HttpPost, ActionName("Index")]
+        public async Task<ActionResult> IndexPOST(CustomSetupViewModel model)
         {
             if (!await IsValidRequest(model.Secret))
             {
@@ -94,8 +94,8 @@ namespace LefeWareLearning.CustomSetup.Controllers
 
                 // Invoke modules to react to the setup event
                 var customsetupEventHandlers = scope.ServiceProvider.GetServices<ICustomTenantSetupEventHandler>();
-                var logger = scope.ServiceProvider.GetRequiredService<ILogger<CustomTenantSetupController>>();
-                await setupEventHandlers.InvokeAsync(x => x.Setup(model.Email, model.Password, reportError), logger);
+                var logger = scope.ServiceProvider.GetRequiredService<ILogger<CustomSetupController>>();
+                await customsetupEventHandlers.InvokeAsync(x => x.Setup(model.Email, model.Password, reportError), logger);
             });
 
             return Redirect($"~/portal");

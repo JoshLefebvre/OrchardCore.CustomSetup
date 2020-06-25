@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LefeWareLearning.Tenants.Models
+namespace OrchardCore.CustomSetup.Models
 {
     public class AdminUserInfo
     {

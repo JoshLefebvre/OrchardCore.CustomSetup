@@ -5,9 +5,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using OrchardCore.Data.Migration;
 using OrchardCore.Modules;
-using LefeWareLearning.CustomSetup.Events;
+using OrchardCore.CustomSetup.Events;
 
-namespace LefeWareLearning.Tenants
+namespace OrchardCore.CustomSetup
 {
     public class Startup : StartupBase
     {
@@ -31,9 +31,9 @@ namespace LefeWareLearning.Tenants
            routes.MapAreaControllerRoute
             (
                 name: "CustomSetup",
-                areaName: "LefeWareLearning.CustomSetup",
+                areaName: "OrchardCore.CustomSetup",
                 pattern: "",//Overrides default Setup pattern
-                defaults: new { controller = "CustomTenantSetup", action = "Setup" }
+                defaults: new { controller = "CustomSetup", action = "Index" }
             );
         }
     }

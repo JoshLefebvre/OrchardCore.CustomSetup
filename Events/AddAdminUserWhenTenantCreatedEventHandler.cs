@@ -1,11 +1,11 @@
 using System;
 using System.Threading.Tasks;
-using LefeWareLearning.CustomSetup.Events;
+using OrchardCore.CustomSetup.Events;
 using OrchardCore.Setup.Events;
 using OrchardCore.Users.Models;
 using OrchardCore.Users.Services;
 
-namespace LefeWareLearning.CustomSetup.Events
+namespace OrchardCore.CustomSetup.Events
 {
     /// <summary>
     /// During setup, creates the admin user account since we never want to give anyone super user.
