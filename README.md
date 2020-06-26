@@ -7,7 +7,7 @@ Create new Tenants and automate emailing the tenant admin a link for `Tenant Set
 
 
 ## Reason
-My tenant creation flow needs to be very customizable for my business. `Tenant Admins` will be responsible for administratrating their sites and I never want to give them `Super User` privileges as this is dangerous. This custom setup module will allow me to create the new tenant admin with a specific role and use a default account for the SuperUser that only I will have access to.
+My tenant creation flow needs to be very customizable and automated for my business. `Tenant Admins` will be responsible for administratrating their sites and I never want to give them `Super User` privileges as this is dangerous. This custom setup module will allow me to create the new tenant admin with a specific role and use a default account for the SuperUser that only I will have access to.
 
 
 ## Setting up your dev environment
@@ -21,7 +21,7 @@ services.AddOrchardCms()
     .AddSetupFeatures("OrchardCore.CustomSetup")
 ```
 6. Comment out the `Setup` route in OrchardCore.Setup Startup.cs so that the new route will be used by default: 
-```
+```csharp
 //routes.MapAreaControllerRoute(
 //    name: "Setup",
 //    areaName: "OrchardCore.Setup",
