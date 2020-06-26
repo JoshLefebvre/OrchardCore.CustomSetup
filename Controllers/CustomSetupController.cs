@@ -14,6 +14,8 @@ using OrchardCore.Email;
 using OrchardCore.Environment.Shell;
 using OrchardCore.Modules;
 using OrchardCore.Setup.Services;
+using OrchardCore.Admin;
+using Microsoft.Extensions.Options;
 
 namespace OrchardCore.CustomSetup.Controllers
 {
@@ -27,6 +29,7 @@ namespace OrchardCore.CustomSetup.Controllers
         private readonly IStringLocalizer S;
         private readonly IEmailAddressValidator _emailAddressValidator;
         private readonly IConfiguration _configuration;
+        private readonly AdminOptions _adminOptions;
 
         public CustomSetupController(
             IShellHost shellHost,
@@ -36,7 +39,8 @@ namespace OrchardCore.CustomSetup.Controllers
             ILogger<CustomSetupController> logger,
             IStringLocalizer<CustomSetupController> localizer,
             IEmailAddressValidator emailAddressValidator,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            IOptions<AdminOptions> adminOptions)
         {
             _shellHost = shellHost;
             _setupService = setupService;
@@ -46,6 +50,7 @@ namespace OrchardCore.CustomSetup.Controllers
             S = localizer;
             _emailAddressValidator = emailAddressValidator;
             _configuration = configuration;
+            _adminOptions = adminOptions.Value;
         }
 
         public async Task<ActionResult> Index(string token)
@@ -55,7 +60,7 @@ namespace OrchardCore.CustomSetup.Controllers
                 return BadRequest(S["Error with tenant setup link. Please contact support to issue a new link"]);
             }
 
-            return View(new CustomSetupViewModel() { Secret = token});
+            return View(new CustomSetupViewModel() { Secret = token });
         }
 
 
@@ -66,13 +71,13 @@ namespace OrchardCore.CustomSetup.Controllers
             {
                 return BadRequest(S["Error with tenant setup link. Please contact support to issue a new link"]);
             }
-            if(!IsModelValid(model))
+            if (!IsModelValid(model))
             {
                 return View(model);
             }
 
             var setupContext = await CreateSetupContext(model.SiteName, model.SiteTimeZone);
-            var executionId = await _setupService.SetupAsync(setupContext);
+            var shellSettings = await _setupService.SetupAsync(setupContext);//Hack: Had to modify SetupAsync to return new shellsettings to get scope
 
             // Check if a component in the Setup failed
             if (setupContext.Errors.Any())
@@ -84,21 +89,20 @@ namespace OrchardCore.CustomSetup.Controllers
                 return View(model);
             }
 
-            var shellScope = await _shellHost.GetScopeAsync(_shellSettings);
-            await shellScope.UsingAsync(async scope =>
+            await (await _shellHost.GetScopeAsync(shellSettings)).UsingAsync(async scope =>
             {
                 void reportError(string key, string message)
                 {
                     setupContext.Errors[key] = message;
                 }
 
-                // Invoke modules to react to the setup event
+                // Invoke modules to react to the custom setup event
                 var customsetupEventHandlers = scope.ServiceProvider.GetServices<ICustomTenantSetupEventHandler>();
                 var logger = scope.ServiceProvider.GetRequiredService<ILogger<CustomSetupController>>();
                 await customsetupEventHandlers.InvokeAsync(x => x.Setup(model.Email, model.Password, reportError), logger);
             });
 
-            return Redirect($"~/portal");
+            return Redirect($"~/{_adminOptions.AdminUrlPrefix}");
         }
 
         private async Task<SetupContext> CreateSetupContext(string siteName, string timeZone)
@@ -106,6 +110,7 @@ namespace OrchardCore.CustomSetup.Controllers
             var recipes = await _setupService.GetSetupRecipesAsync();
             var selectedRecipe = recipes.FirstOrDefault(x => x.Name == _shellSettings["RecipeName"]);
 
+            //Creates a default super user from IConfiguration settings
             var setupContext = new SetupContext
             {
                 ShellSettings = _shellSettings,
@@ -137,7 +142,7 @@ namespace OrchardCore.CustomSetup.Controllers
             {
                 if (string.IsNullOrEmpty(token) || !await IsTokenValid(token))
                 {
-                    _logger.LogWarning("An attempt to access '{TenantName}' without providing a secret was made", _shellSettings.Name);
+                    _logger.LogWarning($"An attempt to access '{_shellSettings.Name}' without providing a secret was made");
                     return false;
                 }
             }
