@@ -24,6 +24,7 @@ namespace OrchardCore.CustomSetup.Controllers
         private readonly IShellHost _shellHost;
         private readonly ISetupService _setupService;
         private readonly ShellSettings _shellSettings;
+        private readonly IShellSettingsManager _shellSettingsManager;
         private readonly IClock _clock;
         private readonly ILogger _logger;
         private readonly IStringLocalizer S;
@@ -40,7 +41,8 @@ namespace OrchardCore.CustomSetup.Controllers
             IStringLocalizer<CustomSetupController> localizer,
             IEmailAddressValidator emailAddressValidator,
             IConfiguration configuration,
-            IOptions<AdminOptions> adminOptions)
+            IOptions<AdminOptions> adminOptions,
+            IShellSettingsManager shellSettingsManager)
         {
             _shellHost = shellHost;
             _setupService = setupService;
@@ -51,6 +53,7 @@ namespace OrchardCore.CustomSetup.Controllers
             _emailAddressValidator = emailAddressValidator;
             _configuration = configuration;
             _adminOptions = adminOptions.Value;
+            _shellSettingsManager = shellSettingsManager;
         }
 
         public async Task<ActionResult> Index(string token)
@@ -77,7 +80,7 @@ namespace OrchardCore.CustomSetup.Controllers
             }
 
             var setupContext = await CreateSetupContext(model.SiteName, model.SiteTimeZone);
-            var shellSettings = await _setupService.SetupAsync(setupContext);//Hack: Had to modify SetupAsync to return new shellsettings to get scope
+            await _setupService.SetupAsync(setupContext);
 
             // Check if a component in the Setup failed
             if (setupContext.Errors.Any())
@@ -89,7 +92,8 @@ namespace OrchardCore.CustomSetup.Controllers
                 return View(model);
             }
 
-            await (await _shellHost.GetScopeAsync(shellSettings)).UsingAsync(async scope =>
+            var shellSetting = await _shellSettingsManager.LoadSettingsAsync(_shellSettings.Name);
+            await (await _shellHost.GetScopeAsync(shellSetting)).UsingAsync(async scope =>
             {
                 void reportError(string key, string message)
                 {
