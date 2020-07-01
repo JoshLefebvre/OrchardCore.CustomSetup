@@ -68,6 +68,7 @@ namespace OrchardCore.CustomSetup.Controllers
 
 
         [HttpPost, ActionName("Index")]
+        [IgnoreAntiforgeryToken]
         public async Task<ActionResult> IndexPOST(CustomSetupViewModel model)
         {
             if (!await IsValidRequest(model.Secret))
@@ -103,7 +104,7 @@ namespace OrchardCore.CustomSetup.Controllers
                 // Invoke modules to react to the custom setup event
                 var customsetupEventHandlers = scope.ServiceProvider.GetServices<ICustomTenantSetupEventHandler>();
                 var logger = scope.ServiceProvider.GetRequiredService<ILogger<CustomSetupController>>();
-                await customsetupEventHandlers.InvokeAsync(x => x.Setup(model.Email, model.Password, reportError), logger);
+                await customsetupEventHandlers.InvokeAsync(x => x.Setup(model.Email, model.Password, "CourseAdmin", reportError), logger);
             });
 
             return Redirect($"~/{_adminOptions.AdminUrlPrefix}");

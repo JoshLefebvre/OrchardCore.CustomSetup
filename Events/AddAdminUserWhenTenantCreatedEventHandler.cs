@@ -19,13 +19,13 @@ namespace OrchardCore.CustomSetup.Events
             _userService = userService;
         }
 
-        public Task Setup(string email, string password, Action<string, string> reportError)
+        public Task Setup(string email, string password, string role, Action<string, string> reportError)
         {
             var user = new User
             {
                 UserName = email,
                 Email = email,
-                RoleNames = new string[] { "CourseAdmin" },//Specific case
+                RoleNames = new string[] { role },//Specific case
                 EmailConfirmed = true
             };
 

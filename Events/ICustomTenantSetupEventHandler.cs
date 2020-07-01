@@ -8,6 +8,6 @@ namespace OrchardCore.CustomSetup.Events
     /// </summary>
     public interface ICustomTenantSetupEventHandler
     {
-        Task Setup(string email, string password, Action<string, string> reportError);
+        Task Setup(string email, string password, string role, Action<string, string> reportError);
     }
 }

@@ -3,11 +3,11 @@
   "name": "TenantCreatedWorkflow",
   "displayName": "Tenant Created Workflow Recipe",
   "description": "Email Admin tenant setup page",
-  "author": "LefeWare Learning",
-  "website": "https://LefewareLearning.com",
+  "author": "LefeWare Solutions",
+  "website": "https://LefeWareSolutions.com",
   "version": "1.0.0",
   "issetuprecipe": false,
-  "categories": [ "default" ],
+  "categories": [ "LefeWare Solutions Core" ],
   "tags": [ "Tenants" ],
 
   // The variables are evaluated the first time they are accessed, and reused across steps
